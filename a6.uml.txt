@@ -1,0 +1,47 @@
+@startuml
+package "Authentication and Authorization System" {
+    class Authentication {
+        - userCredentials : String
+        - authenticate() : Boolean
+    }
+
+    class Attestation {
+        - assertionID : String
+        - verifyAssertion(assertionID) : Boolean
+    }
+
+    class Authorization {
+        - userRights : List<String>
+        - authorize(action, resource) : Boolean
+    }
+
+    class Access {
+        - requestAccess(userID, resource) : Boolean
+    }
+
+    class Audit {
+        - logEntries : List<String>
+        - authenticateAndAuthorizeAccess(userID, resource) : Boolean
+    }
+
+    class Assertions {
+        - posit : String
+        - claimAssertion(posit) : String
+    }
+
+    Authentication --|> Authorization : given access
+    Authentication --|> Audit : given access
+    Authorization --|> Audit : verify audits
+    Attestation ..> Assertions : verifies 
+    Audit ..> Assertions : subject to
+    Audit ..> Attestation : subject to
+    Authorization ..> Assertions : subject to
+    Authentication ..> Attestation : subject to
+
+    Authentication -> Access : authenticate
+    Access -> Authorization : authorize
+    Authorization -> Access : access granted
+    Access -> Audit : log access
+}
+@enduml
+
