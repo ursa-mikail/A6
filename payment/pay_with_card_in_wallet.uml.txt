@@ -1,0 +1,37 @@
+@startuml
+'----- *** -----'
+title "//Pay with card in wallet//"
+
+actor "User" as user
+participant "Merchant" as merchant
+participant "Payment Gateway" as gateway
+participant "Acquiring Bank" as acquiring
+participant "Card Network" as network
+participant "TSP (Federated Token Service Provider)" as tsp
+participant "Issuing Bank" as issuing
+participant "Wallet on Device" as wallet
+
+box "Card Network and TSP"
+    participant "Card Network" as network
+    participant "TSP (Federated Token Service Provider)" as tsp
+end box
+
+merchant -> gateway : 1. Establish trust (using certs)
+user -> wallet : 2. Authenticate with MFA to activate wallet on device
+wallet -> merchant : 3. Pass the permit, handshake MTLS
+merchant -> gateway : 4. Send session token
+gateway -> acquiring : 5. Relay session permit
+acquiring -> network : 6. Send payment transaction token as permit
+network -> tsp : 7. Look up PAN permit in token vault
+network -> issuing : 8. Relay the permit stitched to issuing bank as context session permit
+issuing -> issuing : 9. Validate and authorize transaction
+issuing -> network : 10. Return the signed response as a permit
+
+alt Mass Notification
+    network -> wallet : 11. Relay details directly to device
+    network -> acquiring : 11. Notify updates to acquiring bank
+    network -> gateway : 11. Notify updates to payment gateway
+    network -> merchant : 11. Notify updates to merchant
+end
+@enduml
+

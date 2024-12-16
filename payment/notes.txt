@@ -1,0 +1,24 @@
+[add card to wallet]
+1. add card to trusted agent on phone device (card issued)
+2. device send card details (permit, including PAN) to payment service (server)
+3. payment service (server) send card details (permit, PAN) to issuing bank 
+4. issuing bank relay request payment token (permit, including PAN) to TSP (federated token service provider)
+5. TSP validate PAN, generate payment token (permit with payment-token-key)
+6. TSP return payment token linked with payment-token-key to issuing bank
+7. issuing bank received (permit with payment-token-key) and add CVV-key
+
+8. issuing bank returns permit (token) to phone device and notifies payment service
+9. phone device provision permit onto secure element and confirms with payment service and issuing bank
+
+[pay with card in wallet]
+1. merchant establish trust (using certs) with payment gateway
+2. user authenticate with MFA to activate wallet on device
+3. wallet pass the permit, handshake MTLS with merchant
+4. merchant sent session token to payment gateway
+5. payment gateway relays session permit to acquiring bank
+6. acquiring bank send payment transaction token as permit formatted to card network
+7. card network look up PAN permit in token vault (in TSP)
+8. card network relay the permit stitched to issuing bank as context session permit
+9. issuing bank validate transaction and authorize transaction
+10. issuing bank return the signed response as a permit to card network
+11. card network (having the details) can relay directly to device (and notify updates to acquiring bank, payment gateway, and merchant)

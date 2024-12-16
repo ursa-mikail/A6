@@ -1,0 +1,29 @@
+@startuml
+'----- *** -----'
+title "//Add card to wallet//"
+
+actor "User" as user
+participant "Phone Device" as phone
+participant "Payment Service (Server)" as server
+participant "Issuing Bank" as bank
+participant "TSP (Federated Token Service Provider)" as tsp
+
+user -> phone : 1. Add card to trusted agent on phone device (card issued)
+phone -> server : 2. Send card details (permit, including PAN)
+server -> bank : 3. Send card details (permit, PAN)
+bank -> tsp : 4. Relay request payment token (permit, including PAN)
+tsp -> tsp : 5. Validate PAN, generate payment token (permit with payment-token-key)
+tsp -> bank : 6. Return payment token linked with payment-token-key
+bank -> bank : 7. Add CVV-key
+
+alt Mass Notification
+  bank -> phone : 8. Return permit (token)
+  bank -> server : 8. Notify payment service
+end 
+
+alt Mass Notification
+    phone -> phone : 9. Provision permit onto secure element
+    phone -> server : 9. Confirm with payment service
+    phone -> bank : 9. Confirm with issuing bank
+end
+@enduml
